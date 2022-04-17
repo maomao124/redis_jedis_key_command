@@ -2,8 +2,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.params.ScanParams;
+import redis.clients.jedis.params.SetParams;
+import redis.clients.jedis.resps.ScanResult;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Project name(项目名称)：redis_jedis_key_command
@@ -37,10 +41,17 @@ import java.util.Date;
  * TYPE	        该命令用于获取 value 的数据类型。
  */
 
+
 public class Redis
 {
+    /**
+     * The Jedis.
+     */
     Jedis jedis;
 
+    /**
+     * Sets up.
+     */
     @BeforeEach
     void setUp()
     {
@@ -49,6 +60,9 @@ public class Redis
         System.out.println("打开");
     }
 
+    /**
+     * Tear down.
+     */
     @AfterEach
     void tearDown()
     {
@@ -56,6 +70,9 @@ public class Redis
         jedis.close();
     }
 
+    /**
+     * Set.
+     */
     @Test
     void set()
     {
@@ -63,6 +80,9 @@ public class Redis
         System.out.println(jedis.get("key1"));
     }
 
+    /**
+     * Delete.
+     */
     @Test
     void delete()
     {
@@ -72,6 +92,9 @@ public class Redis
         System.out.println(jedis.del("key1"));
     }
 
+    /**
+     * Dump.
+     */
     @Test
     void dump()
     {
@@ -97,6 +120,9 @@ public class Redis
     }
 
 
+    /**
+     * Exists.
+     */
     @Test
     void exists()
     {
@@ -105,6 +131,9 @@ public class Redis
         System.out.println(jedis.exists("key2"));
     }
 
+    /**
+     * Expire.
+     */
     @Test
     void expire()
     {
@@ -112,6 +141,9 @@ public class Redis
         System.out.println(jedis.expire("key3", 100));
     }
 
+    /**
+     * Expireat.
+     */
     @Test
     void expireat()
     {
@@ -120,6 +152,9 @@ public class Redis
         System.out.println(jedis.expireAt("key4", 9520171953299L));
     }
 
+    /**
+     * Keys.
+     */
     @Test
     void keys()
     {
@@ -128,5 +163,112 @@ public class Redis
         System.out.println(jedis.keys("k*1"));
     }
 
+    /**
+     * Move.
+     */
+    @Test
+    void move()
+    {
+        System.out.println(jedis.get("key1"));
+        System.out.println(jedis.move("key1", 1));
+        System.out.println(jedis.get("key1"));
+        System.out.println(jedis.select(1));
+        System.out.println(jedis.get("key1"));
+        System.out.println(jedis.select(0));
+    }
+
+    /**
+     * Persist.
+     */
+    @Test
+    void persist()
+    {
+        System.out.println(jedis.set("key2", "hello"));
+        System.out.println(jedis.expire("key2", 120));
+        System.out.println(jedis.persist("key2"));
+    }
+
+    /**
+     * Pexpire.
+     */
+    @Test
+    void pexpire()
+    {
+        System.out.println(jedis.pexpire("key2", 30000));
+    }
+
+    /**
+     * Randomkey.
+     */
+    @Test
+    void randomkey()
+    {
+        System.out.println(jedis.randomKey());
+    }
+
+    /**
+     * Rename.
+     */
+    @Test
+    void rename()
+    {
+        System.out.println(jedis.rename("1", "key"));
+    }
+
+    /**
+     * Scan.
+     */
+    @Test
+    void scan()
+    {
+        /*
+        Redis SCAN 命令的基本语法如下：
+        SCAN cursor [MATCH pattern] [COUNT count]
+        参数说明：
+        cursor：游标，游标起始值一般为 0。
+        pattern： 指定匹配模式。
+        count：指定从数据库中返回多少个 key，默认为 10 。
+        */
+
+        {
+            ScanResult<String> result = jedis.scan("0");
+            List<String> list = result.getResult();
+            System.out.println(list);
+        }
+
+        {
+            ScanResult<String> result = jedis.scan("1");
+            List<String> list = result.getResult();
+            System.out.println(list);
+        }
+
+        {
+            ScanResult<String> result = jedis.scan("0", new ScanParams().match("key*"));
+            List<String> list = result.getResult();
+            System.out.println(list);
+        }
+
+    }
+
+    /**
+     * Ttl.
+     */
+    @Test
+    void TTL()
+    {
+        System.out.println(jedis.ttl("key1"));
+        //System.out.println(jedis.set("key5", "hello"));
+        //System.out.println(jedis.expire("key5", 100));
+        System.out.println(jedis.ttl("key5"));
+    }
+
+    /**
+     * Type.
+     */
+    @Test
+    void type()
+    {
+        System.out.println(jedis.type("key1"));
+    }
 
 }
